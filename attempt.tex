@@ -1,0 +1,156 @@
+\documentclass[12pt,a4paper,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[OT1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{multicol}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+
+\newcommand{\com}[2]{\ensuremath{ [{#1} , {#2}]}}
+\newcommand{\sx}[1]{\ensuremath{{\hat{\sigma}_{x_{#1}}}}}
+\newcommand{\sy}[1]{	\ensuremath{{\hat{\sigma}_{y_{#1}}}}}
+\newcommand{\sz}[1]{	\ensuremath{{\hat{\sigma}_{z_{#1}}}}}
+\newcommand{\spm}[1]{\ensuremath{{\hat{\sigma}_{\pm_{#1}}}}}
+\newcommand{\sm}[1]{	\ensuremath{{\hat{\sigma}_{-_{#1}}}}}
+\newcommand{\spp}[1]{\ensuremath{{\hat{\sigma}_{+_{#1}}}}}
+\newcommand{\had}{\ensuremath{\hat{a}^+}}
+\newcommand{\op}[1]{\ensuremath{\hat{{#1}}}}
+\newcommand{\ha}{\ensuremath{\hat{a}}}
+
+
+
+\author{Цицилин Иван}
+
+\begin{document}
+используемые коммутаторы:
+\begin{align}
+	\spm{i}=\frac{\sx{i}\pm i\sy{i}}{2} \\
+	\com{\spm{1}}{\sx{1}}=\pm\sz{1} \\ 
+	\com{\spp{i}}{\sm{i}} = \sz{i} \\
+	\com{\spp{i}}{\sz{i}} = -2\spp{i} \\
+	\com{\sm{i}}{\sz{i}} = 2\sm{i} \\ 	
+ 	\com{\ha}{\had}=1 \\
+ 	\com{\sz{i}}{\sx{i}}=2i\sy{i}
+\end{align}
+При этом, еще коммутатор любой сигма-матрицы и оператора рожд.уничт. равен 0\\
+\\
+Гамильтониан кубита:\\
+$\op{H}_1 = \frac{\hbar\omega_{q_1}}{2}\sz{1}+\hbar\omega_{r} \had\ha+ \hbar g_1(\spp{1}\ha+\sm{1}\had)$\\
+В дисперсионном режиме выполняется $\frac{g}{\Delta}\lll 1$,где$\Delta = \omega_q - \omega_r$- отсройка частоты кубита от частоты резонатора.
+Сделаем унитарное преобразование $\op{U}=e^{\frac{g_1}{\Delta}(\spp{1}\ha-\sm{1}\had)}$
+для этого,воспользуемся леммой хаусдорфа:\\
+$e^{\op{A}} \op{B} e^{-\op{A}} = \op{B}+\com{\op{A}}{\op{B}}+\frac{1}{2}\com{\op{A}}{\com{\op{A}}{\op{B}}}+...$
+в первом приближении по параметру малости $\frac{g_1}{\Delta}$ можно ограничиться только первым коммутатором
+получаем, что $\op{H}_{trans}$ = $\op{H}_1+\com{\frac{g_1}{\Delta}(\spp{1}\ha+\sm{1}\had)}{\op{H}_1}$
+наши вычисления разбиваются на 3 этапа, при этом, держим в уме $\frac{g_1}{\Delta}$ 
+\begin{align}
+\com{\spp{1}\ha-\sm{1}\had}{\frac{\hbar\omega_{q_1}}{2}\sz{1}} \\
+\com{\spp{1}\ha-\sm{1}\had}{\hbar\omega_{r} \had\ha}\\
+\com{\spp{1}\ha-\sm{1}\had}{\hbar g_1(\spp{1}\ha+\sm{1}\had)}
+\end{align}
+1) посчитаем выражение (8): (8) = \\
+$\com{\spp{1}}{\sz{1}}\frac{\hbar\omega_{q_1}}{2}\ha-\com{\sm{1}}{\sz{1}}\frac{\hbar\omega_{q_1}}{2}\had \stackrel{(4)(5)}{=} \\
+-\hbar\omega_{q_1} \spp{1}\ha-\hbar\omega_{q_1}\sm{1}\had =-\hbar\omega_{q_1}(\sm{1}\had+\spp{1}\ha)  \\
+ $
+2) посчитаем выражение (9): (9) = \\
+$\hbar\omega_{r}*\\
+(\spp{1}\ha\had\ha-\had\ha\spp{1}\ha-
+\sm{1}\had\had\ha+\had\ha\sm{1}\had)
+\\ \stackrel{(6)}{=}\hbar\omega_{r}
+(\spp{1}(\had\ha+1)\ha-\had\ha\ha\spp{1}-\\
+\sm{1}\had(\ha\had-1)+\had\ha\had\sm{1})=\\
+\hbar\omega_{r}(\spp{1}\ha+\sm{1}\had)
+$ в результате (9) и (8) получаем:
+$
+\hbar(\omega_r-\omega_{q_1})(\spp{1}\ha+\sm{1}\had)=-\hbar\Delta(\spp{1}\ha+\sm{1}\had)
+$
+т.к. это слагаемое умножается на $\frac{g_1}{\Delta}$, то получаем:
+$
+-\hbar g_1(\spp{1}\ha+\sm{1}\had)
+$, которое уничтожает слагаемое в исходном гамильтониане, отвечающее взаимодействию кубит-резонатор\\
+3) посчитаем выражение (10): (10)=\\
+$
+\com{\spp{1}\ha-\sm{1}\had}{\hbar g_1(\spp{1}\ha+\sm{1}\had)}\stackrel{(*)}{=}
+$ \\т.к. $\com{\op{A}}{\op{A}}=0$,то 
+
+$\stackrel{(*)}{=} \hbar g_1(\com{\spp{1}\ha}{\sm{1}\had}-\com{\sm{1}\had}{\spp{1}\ha})=\\
+=2\hbar g_1\com{\spp{1}\ha}{\sm{1}\had}=2\hbar g_1(\spp{1}\ha\sm{1}\had-\sm{1}\had\spp{1}\ha)\stackrel{(6)}{=}
+2\hbar g_1(\spp{1}\sm{1}(\had\ha+1)-\sm{1}\had\spp{1}\ha)=2\hbar 
+g_1(\com{\spp{1}}{\sm{1}}\had\ha+\spp{1}\sm{1})\stackrel{(3)}{=}
+2\hbar g_1(\sz{1}\had\ha+\spp{1}\sm{1})
+$Отсюда получаем, что наш гамильтониан в дисперсионном режиме имеет представление:
+$
+\op{H}_{trans}=\frac{\hbar\omega_{q_1}}{2}\sz{1}+\hbar\omega_{r} \had\ha+ \frac{2\hbar g_1^2}{\Delta_1}(\sz{1}\had\ha+\spp{1}\sm{1})
+$,т.к. $\spp{1}\sm{1}=\frac{1}{2}(\op{E}-\sz{1})$\\Получили что произойдет с гамильтонианом одного кубита вида$\op{H}_1$ при данном унитарном преобразовании
+\begin{align}
+\op{H}_{trans}\approx\hbar(\omega_r+\frac{2g_1^2}{\Delta_1}\sz{1})\had\ha+
+					  \frac{\hbar}{2}(\omega_{q_1}-\frac{2g_1^2}{\Delta_1})\sz{1} 
+\end{align}
+Для нашей двухкубитной схемы( где есть два кубита, связанные как-то через общий резонатор), гам.системы имеет вид: \\$\op{H_{sys}}=\frac{\hbar\omega_{q_1}}{2}\sz{1} +\frac{\hbar\omega_{q_2}}{2}\sz{2}+\hbar\omega_{r} \had\ha+
+\hbar g_1(\spp{1}\ha+\sm{1}\had)+ \hbar g_2(\spp{2}\ha+\sm{2}\had)$ \\сделаем теперь преобразование $\op{U}=\op{U_1}\op{U_2}$, где $\op{U_i}=
+e^{\frac{g_i}{\Delta_i}(\spp{i}\ha-\sm{i}\had)}
+$ После первого преобразования гам.1ого кубита станет равным (11), посмотрим, как оно повлиет на гамильтониан 2кубита,  так же по лемме Хаусдорфа:
+$\op{H}_{2_{trans}}=\op{H}_2+\com{\frac{g_1}{\Delta_1}(\spp{1}\ha-\sm{1}\had)}{\op{H_2}}$, т.к 
+$\com{\sigma_i^1}{\sigma_j^2}=0  \forall i\in Q1,j\in Q2$, т.к. это две разные системы,то ненулевым является слагаемое вида (10):\\
+$
+\frac{\hbar g_1 g_2}{\Delta_1}\com{\spp{1}\ha-\sm{1}\had}{\spp{2}\ha+\sm{2}\had}=\\
+\frac{\hbar g_1 g_2}{\Delta_1}(\spp{1}\sm{2}\com{\ha}{\had}-\sm{1}\spp{2}\com{\had}{\ha})=\\
+\frac{\hbar g_1 g_2}{\Delta_1}(\spp{1}\sm{2}+\sm{1}\spp{2})\com{\ha}{\had}\stackrel{(6)}{=}\\ \frac{\hbar g_1 g_2}{\Delta_1}(\spp{1}\sm{2}+\sm{1}\spp{2})
+$
+т.е. после первого преобразования, наш гам. системы имеет вид:\\
+$
+\op{H}_{sys_{trans}}\approx\hbar(\omega_r+\frac{2g_1^2}{\Delta_1}\sz{1})\had\ha+
+					  \frac{\hbar}{2}(\omega_{q_1}-\frac{2g_1^2}{\Delta_1})\sz{1}+
+				      \frac{\hbar\omega_{q_2}}{2}\sz{2}+					  
+					  \frac{\hbar g_1 g_2}{\Delta_1}(\spp{1}\sm{2}+\sm{1}\spp{2})
+					  $
+\\					 
+			МОЙ НАСТОЯЩИЙ ГАМИЛЬТОНИАН		 $\frac{\hbar\omega_{Q_1}}{2}\sz{1}+\frac{\hbar \omega_{Q_2}}{2}\sz{2}+\hbar g_2y \sy{2}(\ha - \had)+ \hbar g_2x \sx{2}(\ha + \had)+\hbar g_1 \sx{1}(\ha + \had)+\hbar \omega_r \had\hat+ \hbar g_{12} \sx{2}\sx{1}$
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+Если рассматривать эквивалентную электрическую цепь ,то кинетическая энергия имеет вид:
+$T=\frac{1}{2det(C)}*\\
+(C_1 (C_2 + C_{Q_2}) + C_{Q_2} C_r + C_2 (C_{Q_2} + C_r)) q^2_1 +\\
++ 
+ 2 C_1 (C_2 + C_{Q_2}) q_1 q_2 +\\
+ + (C_1 + C_{Q_1}) (C2 + C_{Q_2}) q^2_2 +\\
+ + 2 C_1 C_2 q_1 q_3 +\\
+ +  2 C_2 (C_1 + C_{Q_1}) q_2 q_3 +\\
+ + (C_{Q_1} (C_2 + C_r) + C_1 (C_2 + C_{Q_1} + C_r)) q^2_3$\\
+ ,где  $det(C)=C_1 C_2 C_{Q_1} + C_1 C_2 C_{Q_2} + C_1 C_{Q_1} C_{Q_2} + C_2 C_{Q_1} C_{Q_2} + C_1 C_2 C_r + 
+ C_2 C_{Q_1} C_r + C_1 C_{Q_2} C_r + C_{Q_1} C_{Q_2} C_r$
+ члены имеющие вид $q_1q_3$ отвечают за связь кубит-кубит,а $q_1q_2,q_2q_3$ кубит-общий резонатор, а потенциальная имеет вид:
+$\Pi=E_{J_1}\cos(\phi_1)+E_{J_2}\cos(\phi_3)-\frac{\phi_2^2}{2L_r}-\frac{(\phi_2-\phi_3)^2}{2L_2}=\\
+E_{J_1}\cos(\phi_1)+E_{J_2}\cos(\phi_3)-\frac{\phi_2^2}{2}(\frac{1}{L_r}+\frac{1}{L_2})-\frac{\phi_3^2}{2L_2}+\frac{\phi_2\phi_3}{L_2}$\\
+член, отвечающие за взаимодействие кубит-резонатор здесь - $\frac{\phi_2\phi_3}{L_2}$
+Теперь проквантуем кубиты и резонаторы.
+"Координаты "$q_1\phi_1$- для 1ого,$q_3\phi_3$- для 2ого,$q_2\phi_2$- для резонатора
+Для кубитов, считая, что $C_1,C_2 \lll C_i$ любого элемента, получаем вид T в нулевом приближении:\\
+$
+\frac{2q_1^2}{C_{Q_1}}+\frac{4 C_1 q_1 q_2}{C_{Q_1} C_r}+\frac{2q_2^2}{C_r}+\frac{4 C_1 C_2 q_1 q_3}{C_{Q_1}
+ C_{Q_2}C_r}+\frac{4 C_2 q_2 q_3}{C_{Q_2} C_r}+\frac{2q_3^2}{C_{Q_2}}
+$\\
+а значит, что наш гамильтониан электрической цепи \op{H} =\\
+$
+\frac{2q_1^2}{C_{Q_1}}+\frac{4 C_1 q_1 q_2}{C_{Q_1} C_r}+\frac{2q_2^2}{C_r}+\frac{4 C_1 C_2 q_1 q_3}{C_{Q_1}
+ C_{Q_2}C_r}+\frac{4 C_2 q_2 q_3}{C_{Q_2} C_r}+\frac{2q_3^2}{C_{Q_2}}+
+\frac{{\phi_1}^2}{2L_1}+\frac{{\phi_3}^2}{2}(\frac{1}{2L_2}-\frac{1}{L_2})-\frac{\phi_2^2}{2}(\frac{1}{L_r}+\frac{1}{L_2})+\frac{\phi_2\phi_3}{L_2}
+$
+\end{document}
