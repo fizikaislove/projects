@@ -1,0 +1,252 @@
+#!/usr/bin/layout
+#name=XMon resonators
+#help=Creates XMon resonator design
+
+#include "../lib/wiring.layout"
+#include "../lib/auxx.layout"
+#include "../lib/layersSetup.layout"
+#include "../lib/resonator.layout"
+#include "../lib/feedline.layout"
+#include "../lib/claw.layout"
+#include "../lib/Xmon.layout"
+#include "../lib/test_JJ.layout"
+#include "../lib/alignment_mark.layout"
+#include "qr_nbal.layout"
+
+        int M = 0;
+        int M1 = 1;
+        int protect = 2;
+        int ground = 3;
+        int mask = 4;
+        int total = 5;
+        int aux = 6;
+        int aux2 = 7;
+        int aux3 = 8;
+        int aux4 = 9;
+        int bandage = 10;
+
+        
+        int chip_height = 5e6;
+        int chip_width = 10e6;
+        int border=50e3;
+        
+        int feedlineDepth = chip_height/4;
+        double ɛ = 11.45;
+        double c = 299792458.0;
+
+        doubleList res_freqs;        
+        doubleList test_res_freqs;
+        
+        int w_res =7e3;
+        int g_res = 4e3;
+        int x = 4e3;//сдвиг между передающей линией и резонатором
+        int tailLen = 800e3;
+        int w_thinGround = 5e3;
+        int L_claw = 60e3;
+        int w_claw = 20e3;
+        
+        int w_feed = 16e3;
+        int g_feed = 8e3;
+        int w_q = 15e3;
+        int g_q = 15e3;
+        int arm_len = 250e3;
+        int ebeam_overlap = 3e3;
+        doubleList asymmetries;
+	
+	 int c_w_q_x = 15e3;
+        int c_g_q_x = 15e3;
+	int c_w_q_y = 10e3;
+        int c_g_q_y = 10e3;
+
+	int q_x_x=125e3;
+	int q_x_y=10e3;
+	int q_x_y_change=50e3;
+	int coup_length_x=55e3;
+	int coup_length_y=50e3;
+	
+int main() {
+    setupLayers();
+    layout->drawing->selectAll();
+    layout->drawing->deleteSelect();
+    layout->drawing->deselectAll();
+
+        
+    //string sample_name = layout->getText("Sample name","Please enter the sample name:", "Xmon NbAl FB ?");
+    
+    int i;
+    
+    cell *curCell = layout->drawing->currentCell;
+    point cursor;
+    // add transmision line
+    intList segmentLengths;
+    stringList directions;
+    directions.append("l");
+    segmentLengths.append(3600e3);
+    cursor.set(-(chip_width/2-3600e3), 0);
+    addFeedline(curCell, cursor, w_feed, g_feed, segmentLengths, directions, "md");
+    
+   
+   
+   
+    // Ground plane
+    curCell->addBox(-chip_width/2, -(chip_height)/2, chip_width, chip_height, ground);
+    
+    int resonatorPositionsX = -chip_width/4;
+    int resonatorPositionsY = -chip_height/4+feedlineDepth-w_feed/2-g_feed-x;
+    res_freqs.append(6.85); res_freqs.append(7); res_freqs.append(7.15);
+
+    
+ 
+    int k = 0;
+    point cursor2;
+    point cursor3;
+    point cursor4;
+    point cursor5;
+    stringList directions; 
+    intList segmentLengths; 
+    double assym=0.391525;
+/////////////////////////////////////////////////////////второй кубит(центральный)
+	cursor.set(resonatorPositionsX+0*chip_width*(1/15)+400e3-5e3, resonatorPositionsY);
+        cursor2 = addResonator(curCell, cursor, w_res+3e3, g_res+2e3, res_freqs.at(2), tailLen, "d", 1);
+	cursor2 = addClaw(curCell, cursor2, "d");
+//добавим тестовый резонатор		
+	cursor.set(resonatorPositionsX, -resonatorPositionsY);
+        addResonator(curCell, cursor, w_res+3e3, g_res+2e3, 9, tailLen, "u", 1);
+
+	cursor3.set(cursor2.x()-400e3, cursor2.y());
+        cursor2 = addXmon(curCell, cursor2, "d", 200, 100, assym);
+ 
+//////добавим Z       
+        directions.append("d"); directions.append("r"); directions.append("d");
+  
+        segmentLengths.append(350e3); segmentLengths.append(1/5*chip_width -cursor2.x()+500e3); segmentLengths.append(chip_height/2 - 300e3-50e3+cursor2.y()); 
+       	addFeedline(curCell, cursor2, w_res, g_res, segmentLengths, directions, "fb");
+
+//////добавим XY	
+	cursor4.set(cursor2.x()+q_x_x, cursor2.y()+q_x_y-q_x_y_change);
+	stringList directions; 
+        directions.append("d");directions.append("r"); directions.append("u");directions.append("r");
+	intList segmentLengths; 
+        segmentLengths.append(300e3-q_x_y_change-30e3);
+	segmentLengths.append(chip_width*(3/5)-500e3); segmentLengths.append(chip_height/2 -480e3+cursor3.y()+100e3+176e3-30e3-3e3+25e3);segmentLengths.append(1000e3-75e3+324e3);
+	addFeedline(curCell, cursor4, w_res, g_res, segmentLengths, directions, "md");
+
+//правый кусок связи
+	cursor5.set(cursor2.x()+arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"r",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+
+//левый кусок
+	cursor5.set(cursor2.x()-arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"l",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+
+////////////////////////////////////////////////////////////////первый кубит
+        cursor.set(resonatorPositionsX, resonatorPositionsY);
+        cursor2 = addResonator(curCell, cursor, w_res+3e3, g_res+2e3, res_freqs.at(0), tailLen, "d",1);
+        cursor2 = addClaw(curCell, cursor2, "d");
+
+        cursor3.set(cursor2.x()-400e3, cursor2.y());
+        cursor2 = addXmon(curCell, cursor2, "d", 200, 100, assym);
+        
+//////добавим Z
+        stringList directions;     
+        directions.append("d"); directions.append("l"); directions.append("d");
+
+        intList segmentLengths; 
+        segmentLengths.append(200e3); segmentLengths.append(230e3); segmentLengths.append(chip_height/2 - 200e3+cursor2.y()); 
+        
+	addFeedline(curCell, cursor2, w_res, g_res, segmentLengths, directions, "fb");
+//////добавим XY       
+	cursor4.set(cursor2.x()+q_x_x, cursor2.y()+q_x_y-q_x_y_change);
+	stringList directions; 
+        directions.append("d"); directions.append("r"); directions.append("d");
+	intList segmentLengths; 
+        segmentLengths.append(450e3-q_x_y_change); segmentLengths.append(chip_width/5-q_x_x-250e3+530e3); segmentLengths.append(chip_height/2 - 420e3+2e3+cursor2.y()-q_x_y); 
+        addFeedline(curCell, cursor4, w_res, g_res, segmentLengths, directions, "md");
+	
+`//правый кусок
+	cursor5.set(cursor2.x()+arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"r",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+//левый кусок
+	cursor5.set(cursor2.x()-arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"l",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+
+
+
+
+
+
+
+
+ 
+/////////////////////////////////////////////////////////////////////////третий кубит
+	cursor.set(resonatorPositionsX+800e3-10e3, resonatorPositionsY);
+        cursor2 = addResonator(curCell, cursor, w_res+3e3, g_res+2e3, res_freqs.at(1), tailLen, "d",1);
+	cursor2 = addClaw(curCell, cursor2, "d");
+///добавим тестовый резонатор
+	cursor.set(resonatorPositionsX+800e3-10e3, -resonatorPositionsY);
+        addResonator(curCell, cursor, w_res+3e3, g_res+2e3, 7.5, tailLen, "u",1);
+//// добавим хмон         
+	cursor2 = addXmon(curCell, cursor2, "d", 200, 100, assym);
+	
+	
+//////добавим Z
+        stringList directions; 
+	directions.append("d"); directions.append("r"); directions.append("u");
+	intList segmentLengths; 
+        segmentLengths.append(140e3); segmentLengths.append( chip_width*(1/4)-cursor2.x()); segmentLengths.append(chip_height + 123e3+cursor2.y()-190e3-2e3+25e3); 
+        addFeedline(curCell, cursor2, w_res, g_res, segmentLengths, directions, "fb");
+
+//////добавим XY
+	cursor4.set(cursor2.x()+q_x_x+90e3,cursor2.y()+q_x_y-56e3);
+	stringList directions; 
+	directions.append("r"); directions.append("u");
+	intList segmentLengths; 
+        segmentLengths.append(chip_width/5-100e3-600e3-19e3); segmentLengths.append( chip_width*(1/4)-cursor4.x()-1300e3+95e3+1e6-95e3+74e3+134.5e3+9e3+21.5e3); 
+        addFeedline(curCell, cursor4, w_res, g_res, segmentLengths, directions, "md");
+	
+//правый кусок
+	cursor5.set(cursor2.x()+arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"r",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+//левый кусок
+	cursor5.set(cursor2.x()-arm_len/2,cursor2.y()+arm_len/2+g_q);
+	cursor5=addStripe(curCell,protect,M,cursor5,"l",coup_length_x,c_w_q_x,c_g_q_x);
+	addStripe(curCell,protect,M,cursor5,"u",coup_length_y,c_w_q_y,c_g_q_y,true);
+	addStripe(curCell,protect,M,cursor5,"d",coup_length_y,c_w_q_y,c_g_q_y,true);
+
+/////////////////////////////////////////////////////////////
+       
+//обычная структура для удобного рисования
+ /*   layout->booleanTool->boolOnLayer( protect,M, total, "A-B", 0, 0, 0);
+    curCell->addBox(-chip_width/2-border, -chip_height/2-border, chip_width+border*2, chip_height+border*2, aux);
+    layout->booleanTool->boolOnLayer(aux, ground, total, "A-B", 0, 0, 0);
+    clearLayer(curCell, aux);*/
+//инвертированная структура для итога и моделирования
+
+   layout->booleanTool->boolOnLayer(ground, protect, mask, "A-B", 0, 0, 0);
+    layout->booleanTool->boolOnLayer(M, mask, total, "A+B", 0, 0, 0);
+
+
+    int hd;
+    layout->backgroundTool->clearBackground();
+/*    hd = layout->backgroundTool->addBackground("background.png");*/
+/*    layout->backgroundTool->backgroundOffset(hd, -5682e3, 2950e3);*/
+/*    layout->backgroundTool->backgroundScale(hd, 8.3e3, 8.3e3);*/
+    clearLayer(curCell, mask);
+    clearLayer(curCell, M);
+    clearLayer(curCell, protect);
+    clearLayer(curCell, ground);
+    //debug.show();
+    //debug.clear();
+
+    
+}
